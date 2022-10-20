@@ -1,12 +1,16 @@
 {
-  "name": "fullstackopen-part3",
+  "name": "fso-phonebook",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf build && cd ../fullstackopen/part2/phonebook && npm run build && cp -r build ../../../fullstackopen-part3",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",    
+    "logs:prod": "fly logs"
   },
   "repository": {
     "type": "git",
@@ -15,10 +19,11 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tymc47/fullstackopen-part3/issues"
+    "url": "https://github.com/tymc47/FSO-Phonebook/issues"
   },
-  "homepage": "https://github.com/tymc47/fullstackopen-part3#readme",
+  "homepage": "https://github.com/tymc47/FSO-Phonebook#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "morgan": "^1.10.0"
   },
