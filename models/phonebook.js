@@ -12,10 +12,30 @@ mongoose.connect(url)
     console.log('error connecting to MongoDB:', error.message)
   })
 
-  const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-})
+    const personSchema = new mongoose.Schema({
+      name: {
+          type: String,
+          minLength: 3,
+          required: true
+      },
+      number: {
+          type: String,
+          validate: {
+            validator: (v) => {
+              if(v.length < 8) return false;
+              if(!v.includes("-")) return false;
+              const [country, number] = v.split("-");
+              if(country.length < 2 || country.length > 3) return false;
+              if(!/^\d+$/.test(country) || !/^\d+$/.test(number)) return false;
+
+              return true;
+            },
+            message: props => `${props.value} is not a valid phone number`
+          },
+          required: true
+      }
+  })
+
 
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
