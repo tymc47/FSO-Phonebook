@@ -1,6 +1,6 @@
-# fly.toml file generated for phonebook-ty-fso on 2022-10-20T21:27:27+08:00
+# fly.toml file generated for fso-phonebook-ty on 2022-10-21T23:27:41+08:00
 
-app = "phonebook-ty-fso"
+app = "fso-phonebook-ty"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
