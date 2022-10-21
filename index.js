@@ -47,26 +47,31 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-  const length = phonebook.length
- 
-  response.send(
-    `<p>Phonebook has info for ${length} people</p>
-    <p>${new Date}</p>`
-  )
-})
-
-app.get('/api/persons/:id', (request, response) => {
-  const id = parseInt(request.params.id)
-  Person.findById(id).then(person => {
-    response.json(person)
+  Person.find({})
+  .then(persons => {
+    response.send(`<p>Phonebook has info for ${persons.length} people</p>
+    <p>${new Date}</p>`)
   })
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = parseInt(request.params.id);
-  phonebook = phonebook.filter(person => person.id !== id)
+app.get('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  Person.findById(id)
+  .then(person => {
+    if(person){
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  })
+  .catch(error => next(error))
+})
 
-  response.status(204).end();
+app.delete('/api/persons/:id', (request, response) => {
+  const id = request.params.id;
+  Person.findByIdAndRemove(id).then(result => {
+    response.status(204).end();
+  })
 })
 
 app.post('/api/persons', (request, response) => {
@@ -77,16 +82,49 @@ app.post('/api/persons', (request, response) => {
       error: "name or number is missing"
     })
   } 
-  
+
   const person = new Person({
     name: body.name,
     number: body.number
   })
-
-  person.save().then(savedPerson => {
-    response.json(savedPerson)
-  })
+  
+  return person.save()
+  .then(savedPerson => response.json(savedPerson))
+    
 })
+
+app.put('/api/persons/:id', (request, response) => {
+  const body = request.body
+  const id = request.params.id
+
+   
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+
+  return Person.findByIdAndUpdate(id, person, { new : true })
+  .then(updated => response.json(updated))
+
+})
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error : 'malformatted id'})
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
